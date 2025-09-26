@@ -69,6 +69,7 @@ server_socket.listen(5)
 print(f"Calculator server running on {HOST}:{PORT}")
 
 # Connection loop
+# Connection loop
 while True:
     conn, addr = server_socket.accept()
     client_ip, client_port = addr
@@ -77,13 +78,28 @@ while True:
     try:
         # Bucle por cliente: múltiples operaciones
         while True:
-            data = conn.recv(4096).decode()
-            if not data:
-                log(f"X {client_ip} → Client disconnected")
-                break
+            try:
+                data = conn.recv(4096).decode()
+                if not data:
+                    log(f"X {client_ip} → Client disconnected")
+                    break
 
-            response = handle_request(data, client_ip)
-            conn.send(json.dumps(response).encode())
+                response = handle_request(data, client_ip)
+                conn.send(json.dumps(response).encode())
+
+            except json.JSONDecodeError as e:
+                # JSON inválido: enviar error pero no cerrar la conexión
+                log(f"X {client_ip} → Invalid JSON: {str(e)}")
+                error_response = {"error": "Invalid JSON", "code": 400}
+                conn.send(json.dumps(error_response).encode())
+            except Exception as e:
+                # Otros errores: registrar y enviar mensaje al cliente
+                log(f"X {client_ip} → Internal error: {str(e)}")
+                error_response = {"error": "Internal server error", "code": 500}
+                try:
+                    conn.send(json.dumps(error_response).encode())
+                except:
+                    break  # si no se puede enviar, salimos del bucle
 
     except Exception as e:
         log(f"X ERROR: Connection handling failed {str(e)}")
