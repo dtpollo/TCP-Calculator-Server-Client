@@ -40,7 +40,7 @@ try:
         with open("logs_Troya.txt", "w", encoding="utf-8") as f:
             f.write(logs)
 
-        print("✅ Logs have been saved to logs_Troya.txt")
+        print("Logs have been saved to logs_Troya.txt")
     else:
         print(f"Error: {response.get('error')} (code {response.get('code')})")
 
