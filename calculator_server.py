@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 HOST = "0.0.0.0"
-PORT = 12345
+PORT = 8080
 LOG_FILE = "server_logs.txt"
 
 def log(message):
