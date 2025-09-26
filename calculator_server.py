@@ -1,23 +1,17 @@
-import socket      # TCP socket communication
-import json        # JSON parsing and serialization
-from datetime import datetime  # Timestamping for logs
+import socket
+import json
+from datetime import datetime
 
-HOST = "0.0.0.0"   # Bind to all interfaces
-PORT = <server_port>        # Listening port
-LOG_FILE = "server_logs.txt"  # Log file path
+HOST = "0.0.0.0"
+PORT = 8080
+LOG_FILE = "server_logs.txt"
 
 def log(message):
-    """Append timestamped log entry to file."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open(LOG_FILE, "a") as f:
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(f"[{timestamp}] {message}\n")
 
 def handle_request(data, client_ip):
-    """
-    Process client JSON request and return response.
-    Expected format: {"a": num, "b": num, "operation": str, "name": str (optional)}
-    Supported operations: add, sub, mul, div, get_logs
-    """
     try:
         payload = json.loads(data)
         a, b, name = payload.get("a"), payload.get("b"), payload.get("name")
@@ -31,7 +25,7 @@ def handle_request(data, client_ip):
             if name is None:
                 log(f"X {client_ip} → ERROR: Missing name {payload}")
                 return {"error": "Missing name", "code": 400}
-            with open(LOG_FILE, "r") as f:
+            with open(LOG_FILE, "r", encoding="utf-8") as f:
                 logs = f.read()
             log(f"**** {name} - {client_ip} → OK: Logs retrieved ****")
             return {"code": 200, "logs": logs}
@@ -76,23 +70,24 @@ print(f"Calculator server running on {HOST}:{PORT}")
 
 # Connection loop
 while True:
+    conn, addr = server_socket.accept()
+    client_ip, client_port = addr
+    log(f"==> Connected to {client_ip}:{client_port}")
+
     try:
-        conn, addr = server_socket.accept()
-        client_ip, client_port = addr
-        log(f"==> Connected to {client_ip}:{client_port}")
+        # Bucle por cliente: múltiples operaciones
+        while True:
+            data = conn.recv(4096).decode()
+            if not data:
+                log(f"X {client_ip} → Client disconnected")
+                break
 
-        data = conn.recv(1024).decode()
-        if not data:
-            log(f"X {client_ip} → ERROR: No data received")
-            conn.close()
-            continue
-
-        response = handle_request(data, client_ip)
-        conn.send(json.dumps(response).encode())
-        log(f"<== Disconnected from {client_ip}:{client_port}")
-        log("\n ----------------------------------------\n")
-        conn.close()
+            response = handle_request(data, client_ip)
+            conn.send(json.dumps(response).encode())
 
     except Exception as e:
         log(f"X ERROR: Connection handling failed {str(e)}")
-
+    finally:
+        log(f"<== Disconnected from {client_ip}:{client_port}")
+        log("\n ----------------------------------------\n")
+        conn.close()
