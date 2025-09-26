@@ -3,7 +3,7 @@ import json        # JSON parsing and serialization
 from datetime import datetime  # Timestamping for logs
 
 HOST = "0.0.0.0"   # Bind to all interfaces
-PORT = 8080        # Listening port
+PORT = <server_port>        # Listening port
 LOG_FILE = "server_logs.txt"  # Log file path
 
 def log(message):
