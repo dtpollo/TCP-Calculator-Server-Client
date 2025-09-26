@@ -24,11 +24,11 @@ Supports basic arithmetic operations, logging, and remote log retrieval for inst
 python3 calculator_server.py
 ```
 ### Client
-# To use the calculator
+#### To use the calculator
 ```bash
 python3 calculator_client.py
 ```
-# To request logs
+#### To request logs
 ```bash
 python3 longs.py
 ```
