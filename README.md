@@ -1,5 +1,5 @@
 # 🧮 Calculator TCP Server & Client
-
+### By ChickenUX 🐔
 ## 🌐 Overview
 Simple TCP-based calculator server and client in Python.  
 Supports basic arithmetic operations, logging, and remote log retrieval for instructors.
@@ -22,3 +22,13 @@ Supports basic arithmetic operations, logging, and remote log retrieval for inst
 ### Server
 ```bash
 python3 calculator_server.py
+```
+### Client
+# To use the calculator
+```bash
+python3 calculator_client.py
+```
+# To request logs
+```bash
+python3 longs.py
+```
